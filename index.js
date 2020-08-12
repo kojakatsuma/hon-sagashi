@@ -5,7 +5,7 @@ const exec = util.promisify(require('child_process').exec)
 
 ;(async () => {
   const browser = await puppeteer.launch({
-    headless: false,
+    headless: true,
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
   })
   const page = await browser.newPage()
