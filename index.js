@@ -1,7 +1,6 @@
 const { writeFileSync } = require('fs')
 const puppeteer = require('puppeteer')
-const util = require('util')
-const exec = util.promisify(require('child_process').exec)
+const { wakatiGaki } = require('./wakatiGaki')
 
 ;(async () => {
   const browser = await puppeteer.launch({
@@ -21,13 +20,10 @@ const exec = util.promisify(require('child_process').exec)
       books.push(`- [${title}](${link})`)
       continue
     }
-    const wakatiTitle = await searchForWakati(title)
-    if (wakatiTitle) {
-      const maybeLink = await search(page, wakatiTitle)
-      if (maybeLink) {
-        maybeBooks.push(`- [${title}](${maybeLink})`)
-        continue
-      }
+    const maybeLink = await searchOfWakati(page, title)
+    if (maybeLink) {
+      maybeBooks.push(`- [${title}](${maybeLink})`)
+      continue
     }
     unFoundBooks.push(`- ${title}`)
   }
@@ -79,7 +75,12 @@ const search = async (page, title) => {
     })
     return linkOfSuggest
   }
-  return null;
+  return null
+}
+
+const searchOfWakati = async (page, title) => {
+  const wakatiTitle = await wakatiGaki(title)
+  return wakatiTitle ? await search(page, wakatiTitle) : null
 }
 
 const getItems = async (page) => {
@@ -103,13 +104,4 @@ const getItems = async (page) => {
     return title
   })
   return titlelist
-}
-
-const searchForWakati = async (title) => {
-  const { stdout, stderr } = await exec(`echo "${title}" | mecab -Owakati`)
-  if (stderr) {
-    console.log(stderr)
-    return null
-  }
-  return stdout
 }
