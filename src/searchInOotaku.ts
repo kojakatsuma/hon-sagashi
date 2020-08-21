@@ -16,10 +16,7 @@ export const searchInOotaku = async (page: Page, title: string): Promise<string 
 
   const topLink = await page.evaluate(() => {
     const topResult = document.querySelector('#result > section > h3 > a') as HTMLLinkElement;
-    if (topResult) {
-      return topResult.href;
-    }
-    return null;
+    return topResult?.href;
   });
 
   if (topLink) {
