@@ -29,7 +29,7 @@ import { searchInOotaku, searchOfWakatiInOotaku } from "./searchInOotaku";
   }
   console.log('complete search')
   fs.writeFileSync(
-    '../result.md',
+    './result.md',
     books.concat(maybeBooks).concat(unFoundBooks).join('\n'),
     {
       encoding: 'utf-8',
