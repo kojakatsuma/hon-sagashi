@@ -5,6 +5,8 @@ export const getItems = async (page: Page) => {
     'https://www.amazon.co.jp/hz/wishlist/printview/1LT97CIJHMD3V'
   );
 
+  await page.waitFor(3000)
+  
   const titlelist = await page.evaluate(() => {
     const title: string[] = [];
     document.querySelectorAll(".a-align-center > .a-text-bold")
