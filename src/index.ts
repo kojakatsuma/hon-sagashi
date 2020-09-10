@@ -11,6 +11,10 @@ import { searchInOotaku, searchOfWakatiInOotaku } from "./searchInOotaku";
   const page = await browser.newPage()
   console.log('init page')
   const titlelist = await getItems(page)
+  if(!titlelist.length){
+    console.log('not found items')
+    await browser.close()
+  }
   const books = ['## 見つかった本']
   const maybeBooks = ['## 多分ある本']
   const unFoundBooks = ['## 見つからなかった本']
