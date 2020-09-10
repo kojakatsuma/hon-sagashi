@@ -14,6 +14,7 @@ import { searchInOotaku, searchOfWakatiInOotaku } from "./searchInOotaku";
   if(!titlelist.length){
     console.log('not found items')
     await browser.close()
+    process.exit()
   }
   const books = ['## 見つかった本']
   const maybeBooks = ['## 多分ある本']
