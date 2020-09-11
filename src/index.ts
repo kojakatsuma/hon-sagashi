@@ -9,6 +9,11 @@ import { searchInOotaku, searchOfWakatiInOotaku } from "./searchInOotaku";
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
   })
   const page = await browser.newPage()
+  await page.evaluateOnNewDocument(() => {
+    Object.defineProperty(navigator, 'webdriver', {
+      get: () => undefined,
+    });
+  })
   console.log('init page')
   const titlelist = await getItems(page)
   if (!titlelist.length) {
