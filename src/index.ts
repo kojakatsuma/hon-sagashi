@@ -11,7 +11,7 @@ import { searchInOotaku, searchOfWakatiInOotaku } from "./searchInOotaku";
   const page = await browser.newPage()
   console.log('init page')
   const titlelist = await getItems(page)
-  if(!titlelist.length){
+  if (!titlelist.length) {
     console.log('not found items')
     await browser.close()
     process.exit()
@@ -20,14 +20,20 @@ import { searchInOotaku, searchOfWakatiInOotaku } from "./searchInOotaku";
   const maybeBooks = ['## 多分ある本']
   const unFoundBooks = ['## 見つからなかった本']
   for (const title of titlelist) {
-    const link = await searchInOotaku(page, title)
+    const [link, libs] = await searchInOotaku(page, title)
     if (link) {
       books.push(`- [${title}](${link})`)
+      if (libs) {
+        books.push(`\t - ${libs.join(',')}`)
+      }
       continue
     }
-    const maybeLink = await searchOfWakatiInOotaku(page, title)
+    const [maybeLink, maybeLibs] = await searchOfWakatiInOotaku(page, title)
     if (maybeLink) {
       maybeBooks.push(`- [${title}](${maybeLink})`)
+      if (maybeLibs) {
+        maybeBooks.push(`\t - ${maybeLibs.join(',')}`)
+      }
       continue
     }
     unFoundBooks.push(`- ${title}`)

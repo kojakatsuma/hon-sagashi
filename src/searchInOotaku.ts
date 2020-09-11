@@ -1,12 +1,23 @@
 import { wakatiGaki } from './wakatiGaki';
 import { Page } from 'puppeteer';
 
-export const searchInOotaku = async (page: Page, title: string): Promise<string | null> => {
+const getLibs = async (page: Page, detaliOfBookLink: string) => {
+  await page.goto(detaliOfBookLink)
+  await page.waitForSelector('div > table > tbody > tr > td.cent')
+  const libs = await page.evaluate(() => {
+    const libList: string[] = []
+    document.querySelectorAll('div > table > tbody > tr > td.cent').forEach(lib => libList.push(lib.textContent || ''))
+    return libList.filter(lib => lib)
+  })
+  return libs
+}
+
+export const searchInOotaku = async (page: Page, title: string): Promise<[string | null, string[]] | []> => {
   await page.goto('https://www.lib.city.ota.tokyo.jp/index.html');
   await page.waitForSelector('.imeon');
   const search = await page.$('.imeon');
   if (!search) {
-    return null
+    return []
   }
   await search.type(title);
   await page.waitForSelector('input[name="buttonSubmit"]');
@@ -20,7 +31,9 @@ export const searchInOotaku = async (page: Page, title: string): Promise<string 
   });
 
   if (topLink) {
-    return topLink;
+    const libs = await getLibs(page, topLink)
+    console.log(libs)
+    return [topLink, libs];
   }
 
   const suggest = await page.$(
@@ -36,12 +49,17 @@ export const searchInOotaku = async (page: Page, title: string): Promise<string 
       }
       return null;
     });
-    return linkOfSuggest;
+    if (!linkOfSuggest) {
+      return []
+    }
+    const libs = await getLibs(page, linkOfSuggest)
+    console.log(libs)
+    return [linkOfSuggest, libs];
   }
-  return null;
+  return [];
 };
 
-export const searchOfWakatiInOotaku = async (page: Page, title: string): Promise<string | null> => {
+export const searchOfWakatiInOotaku = async (page: Page, title: string): Promise<[string | null, string[]] | []> => {
   const wakatiTitle = await wakatiGaki(title);
-  return wakatiTitle ? await searchInOotaku(page, wakatiTitle) : null;
+  return wakatiTitle ? await searchInOotaku(page, wakatiTitle) : [];
 };
