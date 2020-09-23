@@ -4,7 +4,8 @@
   "description": "",
   "main": "src/index.ts",
   "scripts": {
-    "start": "ts-node src/index.ts",
+    "prestart": "tsc",
+    "start": "node lib/index.js",
     "poststart": "git add -u && git commit -m 'update' && git push origin "
   },
   "keywords": [],
