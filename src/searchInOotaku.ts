@@ -19,11 +19,11 @@ export const search = async (wsEndpoint: string, titleChunk: string[]) => {
   for (const title of titleChunk) {
     try {
       const [url, libs] = await searchInOotaku(page, title)
-      results.push([title, url, libs.join(',')])
+      results.push({ title, url, libs })
     } catch (error) {
       console.log('error....retry')
       const [url, libs] = await searchInOotaku(page, title)
-      results.push([title, url, libs.join(',')])
+      results.push({ title, url, libs })
     }
   }
   browser.disconnect()

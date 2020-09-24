@@ -24,12 +24,10 @@ const chunk = (arr: string[], size: number) => {
     await browser.close()
     process.exit()
   }
-  const books = await Promise.all(chunk(titlelist, 20).map(titleChunk => search(browserWSEndpoint, titleChunk)))
-  console.log(books)
-  console.log('complete search')
+  const books = await (await Promise.all(chunk(titlelist, 10).map(titleChunk => search(browserWSEndpoint, titleChunk)))).flat()
   fs.writeFileSync(
     './result.md',
-    books.join('\n'),
+    books.map(({ title, url, libs }) => `- [${title}](${url}): ${libs.join(',')}`).join('\n'),
     {
       encoding: 'utf-8',
     },

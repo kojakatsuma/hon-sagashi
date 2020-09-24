@@ -22,5 +22,5 @@ export const getItems = async (wsEndpoint: string) => {
   });
   console.log(`complete getItem: ${titlelist.length}`)
   browser.disconnect()
-  return titlelist;
+  return titlelist
 };
