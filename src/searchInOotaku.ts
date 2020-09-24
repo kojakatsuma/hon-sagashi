@@ -21,7 +21,6 @@ export const searchInOotaku = async (wsEndpoint: string, title: string, isWakati
   if (!search) {
     browser.disconnect()
     throw new Error('undefind Search page')
-    return []
   }
   await search.type(title);
   await page.waitForSelector('input[name="buttonSubmit"]');
@@ -68,14 +67,10 @@ export const searchInOotaku = async (wsEndpoint: string, title: string, isWakati
     browser.disconnect()
     console.log('wakati')
     const wakatiTitle = await wakatiGaki(title);
-    return searchInOotaku(wsEndpoint, wakatiTitle, true)
+    return await searchInOotaku(wsEndpoint, wakatiTitle, true)
   }
 
   browser.disconnect()
   return ["なし", ["なし"]]
 };
 
-export const searchOfWakatiInOotaku = async (wsEndpoint: string, title: string): Promise<[string | null, string[]] | []> => {
-  const wakatiTitle = await wakatiGaki(title);
-  return wakatiTitle ? await searchInOotaku(wsEndpoint, wakatiTitle) : [];
-};
