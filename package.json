@@ -5,8 +5,7 @@
   "main": "src/index.ts",
   "scripts": {
     "prestart": "tsc",
-    "start": "node lib/index.js",
-    "poststart": "git add -u && git commit -m 'update' && git push origin "
+    "start": "node lib/index.js"
   },
   "keywords": [],
   "author": "",
