@@ -8,14 +8,10 @@ import { searchInOotaku, searchOfWakatiInOotaku } from "./searchInOotaku";
     headless: true,
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
   })
-  const page = await browser.newPage()
-  await page.evaluateOnNewDocument(() => {
-    Object.defineProperty(navigator, 'webdriver', {
-      get: () => undefined,
-    });
-  })
+  const browserWSEndpoint = browser.wsEndpoint();
+  browser.disconnect()
   console.log('init page')
-  const titlelist = await getItems(page)
+  const titlelist = await getItems(browserWSEndpoint)
   if (!titlelist.length) {
     console.log('not found items')
     await browser.close()
@@ -25,7 +21,7 @@ import { searchInOotaku, searchOfWakatiInOotaku } from "./searchInOotaku";
   const maybeBooks = ['## 多分ある本']
   const unFoundBooks = ['## 見つからなかった本']
   for (const title of titlelist) {
-    const [link, libs] = await searchInOotaku(page, title)
+    const [link, libs] = await searchInOotaku(browserWSEndpoint, title)
     if (link) {
       books.push(`- [${title}](${link})`)
       if (libs) {
@@ -33,7 +29,7 @@ import { searchInOotaku, searchOfWakatiInOotaku } from "./searchInOotaku";
       }
       continue
     }
-    const [maybeLink, maybeLibs] = await searchOfWakatiInOotaku(page, title)
+    const [maybeLink, maybeLibs] = await searchOfWakatiInOotaku(browserWSEndpoint, title)
     if (maybeLink) {
       maybeBooks.push(`- [${title}](${maybeLink})`)
       if (maybeLibs) {

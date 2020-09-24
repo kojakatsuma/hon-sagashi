@@ -1,5 +1,5 @@
 import { wakatiGaki } from './wakatiGaki';
-import { Page } from 'puppeteer';
+import puppeteer, { Page } from 'puppeteer';
 
 const getLibs = async (page: Page, detaliOfBookLink: string) => {
   await page.goto(detaliOfBookLink)
@@ -12,7 +12,9 @@ const getLibs = async (page: Page, detaliOfBookLink: string) => {
   return libs
 }
 
-export const searchInOotaku = async (page: Page, title: string): Promise<[string | null, string[]] | []> => {
+export const searchInOotaku = async (wsEndpoint: string, title: string): Promise<[string | null, string[]] | []> => {
+  const browser = await puppeteer.connect({ browserWSEndpoint: wsEndpoint })
+  const page = await browser.newPage()
   await page.goto('https://www.lib.city.ota.tokyo.jp/index.html');
   await page.waitForSelector('.imeon');
   const search = await page.$('.imeon');
@@ -33,6 +35,7 @@ export const searchInOotaku = async (page: Page, title: string): Promise<[string
   if (topLink) {
     const libs = await getLibs(page, topLink)
     console.log(libs)
+    browser.disconnect()
     return [topLink, libs];
   }
 
@@ -50,16 +53,19 @@ export const searchInOotaku = async (page: Page, title: string): Promise<[string
       return null;
     });
     if (!linkOfSuggest) {
+      browser.disconnect()
       return []
     }
     const libs = await getLibs(page, linkOfSuggest)
     console.log(libs)
+    browser.disconnect()
     return [linkOfSuggest, libs];
   }
+  browser.disconnect()
   return [];
 };
 
-export const searchOfWakatiInOotaku = async (page: Page, title: string): Promise<[string | null, string[]] | []> => {
+export const searchOfWakatiInOotaku = async (wsEndpoint: string, title: string): Promise<[string | null, string[]] | []> => {
   const wakatiTitle = await wakatiGaki(title);
-  return wakatiTitle ? await searchInOotaku(page, wakatiTitle) : [];
+  return wakatiTitle ? await searchInOotaku(wsEndpoint, wakatiTitle) : [];
 };

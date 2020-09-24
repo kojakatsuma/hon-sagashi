@@ -1,6 +1,13 @@
-import { Page } from 'puppeteer';
+import puppeteer from 'puppeteer';
 
-export const getItems = async (page: Page) => {
+export const getItems = async (wsEndpoint: string) => {
+  const browser = await puppeteer.connect({ browserWSEndpoint: wsEndpoint })
+  const page = await browser.newPage()
+  await page.evaluateOnNewDocument(() => {
+    Object.defineProperty(navigator, 'webdriver', {
+      get: () => undefined,
+    });
+  })
   await page.goto(
     'https://www.amazon.co.jp/hz/wishlist/printview/1LT97CIJHMD3V'
   );
@@ -14,5 +21,6 @@ export const getItems = async (page: Page) => {
     return title;
   });
   console.log(`complete getItem: ${titlelist.length}`)
+  browser.disconnect()
   return titlelist;
 };
