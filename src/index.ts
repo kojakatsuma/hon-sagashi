@@ -1,7 +1,7 @@
 import fs from "fs";
 import puppeteer from "puppeteer";
 import { getItems } from './getItems';
-import { searchInOotaku, searchOfWakatiInOotaku } from "./searchInOotaku";
+import { searchInOotaku } from "./searchInOotaku";
 
 (async () => {
   const browser = await puppeteer.launch({
@@ -17,32 +17,15 @@ import { searchInOotaku, searchOfWakatiInOotaku } from "./searchInOotaku";
     await browser.close()
     process.exit()
   }
-  const books = ['## 見つかった本']
-  const maybeBooks = ['## 多分ある本']
-  const unFoundBooks = ['## 見つからなかった本']
+  const books = []
   for (const title of titlelist) {
-    const [link, libs] = await searchInOotaku(browserWSEndpoint, title)
-    if (link) {
-      books.push(`- [${title}](${link})`)
-      if (libs) {
-        books.push(`\t - ${libs.join(',')}`)
-      }
-      continue
-    }
-    const [maybeLink, maybeLibs] = await searchOfWakatiInOotaku(browserWSEndpoint, title)
-    if (maybeLink) {
-      maybeBooks.push(`- [${title}](${maybeLink})`)
-      if (maybeLibs) {
-        maybeBooks.push(`\t - ${maybeLibs.join(',')}`)
-      }
-      continue
-    }
-    unFoundBooks.push(`- ${title}`)
+    books.push(await searchInOotaku(browserWSEndpoint, title))
   }
+  console.log(books)
   console.log('complete search')
   fs.writeFileSync(
     './result.md',
-    books.concat(maybeBooks).concat(unFoundBooks).join('\n'),
+    books.join('\n'),
     {
       encoding: 'utf-8',
     },

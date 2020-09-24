@@ -12,13 +12,15 @@ const getLibs = async (page: Page, detaliOfBookLink: string) => {
   return libs
 }
 
-export const searchInOotaku = async (wsEndpoint: string, title: string): Promise<[string | null, string[]] | []> => {
+export const searchInOotaku = async (wsEndpoint: string, title: string, isWakatiGaki: boolean = false): Promise<[string | null, string[]] | []> => {
   const browser = await puppeteer.connect({ browserWSEndpoint: wsEndpoint })
   const page = await browser.newPage()
   await page.goto('https://www.lib.city.ota.tokyo.jp/index.html');
   await page.waitForSelector('.imeon');
   const search = await page.$('.imeon');
   if (!search) {
+    browser.disconnect()
+    throw new Error('undefind Search page')
     return []
   }
   await search.type(title);
@@ -41,26 +43,36 @@ export const searchInOotaku = async (wsEndpoint: string, title: string): Promise
   const suggest = await page.$(
     '#honbun > section > div > div > div > div:nth-child(6) > div > dl > dd > a'
   );
-  if (suggest) {
-    await suggest.click();
-    await page.waitForSelector('#honbun > section');
-    const linkOfSuggest = await page.evaluate(() => {
-      const topResult = document.querySelector('#result > section > h3 > a') as HTMLLinkElement;
-      if (topResult) {
-        return topResult.href;
-      }
-      return null;
-    });
-    if (!linkOfSuggest) {
-      browser.disconnect()
-      return []
+
+  if (!suggest) {
+    browser.disconnect()
+    return ['なし', ["なし"]]
+  }
+  await suggest.click();
+  await page.waitForSelector('#honbun > section');
+  const linkOfSuggest = await page.evaluate(() => {
+    const topResult = document.querySelector('#result > section > h3 > a') as HTMLLinkElement;
+    if (topResult) {
+      return topResult.href;
     }
+    return null;
+  });
+
+  if (linkOfSuggest) {
     const libs = await getLibs(page, linkOfSuggest)
     browser.disconnect()
     return [linkOfSuggest, libs];
   }
+
+  if (!isWakatiGaki) {
+    browser.disconnect()
+    console.log('wakati')
+    const wakatiTitle = await wakatiGaki(title);
+    return searchInOotaku(wsEndpoint, wakatiTitle, true)
+  }
+
   browser.disconnect()
-  return [];
+  return ["なし", ["なし"]]
 };
 
 export const searchOfWakatiInOotaku = async (wsEndpoint: string, title: string): Promise<[string | null, string[]] | []> => {
