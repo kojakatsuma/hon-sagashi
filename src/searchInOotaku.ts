@@ -12,14 +12,29 @@ const getLibs = async (page: Page, detaliOfBookLink: string) => {
   return libs
 }
 
-export const searchInOotaku = async (wsEndpoint: string, title: string, isWakatiGaki: boolean = false): Promise<[string | null, string[]] | []> => {
+export const search = async (wsEndpoint: string, titleChunk: string[]) => {
   const browser = await puppeteer.connect({ browserWSEndpoint: wsEndpoint })
   const page = await browser.newPage()
+  const results = []
+  for (const title of titleChunk) {
+    try {
+      const [url, libs] = await searchInOotaku(page, title)
+      results.push([title, url, libs.join(',')])
+    } catch (error) {
+      console.log('error....retry')
+      const [url, libs] = await searchInOotaku(page, title)
+      results.push([title, url, libs.join(',')])
+    }
+  }
+  browser.disconnect()
+  return results
+}
+
+export const searchInOotaku = async (page: Page, title: string, isWakatiGaki: boolean = false): Promise<[string | null, string[]]> => {
   await page.goto('https://www.lib.city.ota.tokyo.jp/index.html');
   await page.waitForSelector('.imeon');
   const search = await page.$('.imeon');
   if (!search) {
-    browser.disconnect()
     throw new Error('undefind Search page')
   }
   await search.type(title);
@@ -35,7 +50,6 @@ export const searchInOotaku = async (wsEndpoint: string, title: string, isWakati
 
   if (topLink) {
     const libs = await getLibs(page, topLink)
-    browser.disconnect()
     return [topLink, libs];
   }
 
@@ -43,34 +57,27 @@ export const searchInOotaku = async (wsEndpoint: string, title: string, isWakati
     '#honbun > section > div > div > div > div:nth-child(6) > div > dl > dd > a'
   );
 
-  if (!suggest) {
-    browser.disconnect()
-    return ['なし', ["なし"]]
-  }
-  await suggest.click();
-  await page.waitForSelector('#honbun > section');
-  const linkOfSuggest = await page.evaluate(() => {
-    const topResult = document.querySelector('#result > section > h3 > a') as HTMLLinkElement;
-    if (topResult) {
-      return topResult.href;
+  if (suggest) {
+    await suggest.click();
+    await page.waitForSelector('#honbun > section');
+    const linkOfSuggest = await page.evaluate(() => {
+      const topResult = document.querySelector('#result > section > h3 > a') as HTMLLinkElement;
+      if (topResult) {
+        return topResult.href;
+      }
+      return null;
+    });
+
+    if (linkOfSuggest) {
+      const libs = await getLibs(page, linkOfSuggest)
+      return [linkOfSuggest, libs];
     }
-    return null;
-  });
-
-  if (linkOfSuggest) {
-    const libs = await getLibs(page, linkOfSuggest)
-    browser.disconnect()
-    return [linkOfSuggest, libs];
   }
-
   if (!isWakatiGaki) {
-    browser.disconnect()
-    console.log('wakati')
     const wakatiTitle = await wakatiGaki(title);
-    return await searchInOotaku(wsEndpoint, wakatiTitle, true)
+    return await searchInOotaku(page, wakatiTitle, true)
   }
 
-  browser.disconnect()
   return ["なし", ["なし"]]
 };
 

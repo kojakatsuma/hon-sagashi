@@ -1,7 +1,14 @@
 import fs from "fs";
 import puppeteer from "puppeteer";
 import { getItems } from './getItems';
-import { searchInOotaku } from "./searchInOotaku";
+import { search } from "./searchInOotaku";
+
+const chunk = (arr: string[], size: number) => {
+  return arr.reduce(
+    (newarr, _, i) => (i % size ? newarr : [...newarr, arr.slice(i, i + size)]),
+    [] as string[][]
+  )
+}
 
 (async () => {
   const browser = await puppeteer.launch({
@@ -17,10 +24,7 @@ import { searchInOotaku } from "./searchInOotaku";
     await browser.close()
     process.exit()
   }
-  const books = []
-  for (const title of titlelist) {
-    books.push(await searchInOotaku(browserWSEndpoint, title))
-  }
+  const books = await Promise.all(chunk(titlelist, 20).map(titleChunk => search(browserWSEndpoint, titleChunk)))
   console.log(books)
   console.log('complete search')
   fs.writeFileSync(
