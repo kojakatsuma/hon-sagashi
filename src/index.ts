@@ -24,7 +24,9 @@ const chunk = (arr: string[], size: number) => {
     await browser.close()
     process.exit()
   }
-  const books = await (await Promise.all(chunk(titlelist, 10).map(titleChunk => search(browserWSEndpoint, titleChunk)))).flat()
+  const chunkSize = titlelist.length > 10 ? titlelist.length * 0.1 : 1
+  console.log('chunk size is ', chunkSize)
+  const books = await (await Promise.all(chunk(titlelist, chunkSize).map(titleChunk => search(browserWSEndpoint, titleChunk)))).flat()
   fs.writeFileSync(
     './result.md',
     books.map(({ title, url, libs }) => `- [${title}](${url}): ${libs.join(',')}`).join('\n'),
