@@ -34,7 +34,6 @@ export const searchInOotaku = async (wsEndpoint: string, title: string): Promise
 
   if (topLink) {
     const libs = await getLibs(page, topLink)
-    console.log(libs)
     browser.disconnect()
     return [topLink, libs];
   }
@@ -57,7 +56,6 @@ export const searchInOotaku = async (wsEndpoint: string, title: string): Promise
       return []
     }
     const libs = await getLibs(page, linkOfSuggest)
-    console.log(libs)
     browser.disconnect()
     return [linkOfSuggest, libs];
   }
