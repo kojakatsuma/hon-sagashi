@@ -16,21 +16,23 @@ export const search = async (wsEndpoint: string, titleChunk: string[]) => {
   const browser = await puppeteer.connect({ browserWSEndpoint: wsEndpoint })
   const page = await browser.newPage()
   const results = []
+  const searchTitle = async (title: string) => {
+    const [url, libs, isSuggest, isWakatiGaki] = await searchInOotaku(page, title)
+    return { title, url, libs, isSuggest, isWakatiGaki }
+  }
   for (const title of titleChunk) {
     try {
-      const [url, libs] = await searchInOotaku(page, title)
-      results.push({ title, url, libs })
+      results.push(await searchTitle(title))
     } catch (error) {
       console.log('error....retry')
-      const [url, libs] = await searchInOotaku(page, title)
-      results.push({ title, url, libs })
+      results.push(await searchTitle(title))
     }
   }
   browser.disconnect()
   return results
 }
 
-export const searchInOotaku = async (page: Page, title: string, isWakatiGaki: boolean = false): Promise<[string | null, string[]]> => {
+export const searchInOotaku = async (page: Page, title: string, isWakatiGaki: boolean = false): Promise<[string, string[], boolean, boolean]> => {
   await page.goto('https://www.lib.city.ota.tokyo.jp/index.html');
   await page.waitForSelector('.imeon');
   const search = await page.$('.imeon');
@@ -50,7 +52,7 @@ export const searchInOotaku = async (page: Page, title: string, isWakatiGaki: bo
 
   if (topLink) {
     const libs = await getLibs(page, topLink)
-    return [topLink, libs];
+    return [topLink, libs, false, isWakatiGaki];
   }
 
   const suggest = await page.$(
@@ -70,7 +72,7 @@ export const searchInOotaku = async (page: Page, title: string, isWakatiGaki: bo
 
     if (linkOfSuggest) {
       const libs = await getLibs(page, linkOfSuggest)
-      return [linkOfSuggest, libs];
+      return [linkOfSuggest, libs, true, isWakatiGaki];
     }
   }
   if (!isWakatiGaki) {
@@ -78,6 +80,6 @@ export const searchInOotaku = async (page: Page, title: string, isWakatiGaki: bo
     return await searchInOotaku(page, wakatiTitle, true)
   }
 
-  return ["なし", ["なし"]]
+  return ["なし", ["なし"], true, isWakatiGaki]
 };
 
