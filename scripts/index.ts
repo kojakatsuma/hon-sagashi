@@ -10,13 +10,6 @@ const chunk = (arr: string[], size: number) => {
   )
 }
 
-const template = ({ title, url, libs, isSuggest, isWakatiGaki }: { title: string, url: string, libs: string[], isSuggest: boolean, isWakatiGaki: boolean }) => {
-  if (url === "なし") {
-    return `- ${title}: 図書館 なし, サジェスト検索 ${isSuggest ? "した" : "してない"}, わかち書きで検索 ${isWakatiGaki ? "した" : "してない"}`
-  }
-  return `- [${title}](${url}): 図書館 ${libs.join(',')},サジェスト検索 ${isSuggest ? "した" : "してない"}, わかち書きで検索 ${isWakatiGaki ? "した" : "してない"}`
-}
-
 (async () => {
   const browser = await puppeteer.launch({
     headless: true,
@@ -35,7 +28,7 @@ const template = ({ title, url, libs, isSuggest, isWakatiGaki }: { title: string
   console.log('chunk size is ', chunkSize)
   const books = await (await Promise.all(chunk(titlelist, chunkSize).map(titleChunk => search(browserWSEndpoint, titleChunk)))).flat()
   fs.writeFileSync(
-    './result.json',
+    '../front/src/result.json',
     JSON.stringify(books),
     {
       encoding: 'utf-8',
