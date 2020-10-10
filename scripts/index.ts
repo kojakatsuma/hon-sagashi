@@ -2,6 +2,7 @@ import fs from "fs";
 import puppeteer from "puppeteer";
 import { getItems } from './getItems';
 import { search } from "./searchInOotaku";
+import path from "path";
 
 const chunk = (arr: string[], size: number) => {
   return arr.reduce(
@@ -28,7 +29,7 @@ const chunk = (arr: string[], size: number) => {
   console.log('chunk size is ', chunkSize)
   const books = await (await Promise.all(chunk(titlelist, chunkSize).map(titleChunk => search(browserWSEndpoint, titleChunk)))).flat()
   fs.writeFileSync(
-    '../front/src/result.json',
+    path.resolve(__dirname, '../front/src/result.json'),
     JSON.stringify(books),
     {
       encoding: 'utf-8',
