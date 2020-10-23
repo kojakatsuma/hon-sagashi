@@ -6,7 +6,7 @@
   "scripts": {
     "prestart": "tsc",
     "start": "node lib/index.js",
-    "poststart": "cd front && npm run build",
+    "poststart": "cd front && npm run build && gh-pages -d front/build",
     "deploy": "gh-pages -d front/build"
   },
   "keywords": [],
