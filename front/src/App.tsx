@@ -11,15 +11,17 @@ const TD: React.FC<{
   libs: string[]
   isSuggest: boolean
   isWakatiGaki: boolean
-}> = ({ title, url, libs, isSuggest, isWakatiGaki }) => {
+  resultTitle: string
+}> = ({ title, url, libs, isSuggest, isWakatiGaki, resultTitle }) => {
   return (
     <tr>
+      <td>{title}</td>
       <td>
         {url === 'なし' ? (
-          title
+          resultTitle
         ) : (
           <a target="blank" href={url}>
-            {title}
+            {resultTitle}
           </a>
         )}
       </td>
@@ -40,6 +42,7 @@ type Books = {
   libs: string[]
   isSuggest: boolean
   isWakatiGaki: boolean
+  resultTitle: string
 }[]
 
 const useFilter = (): [Books, string[], (libName: string) => void] => {
@@ -74,7 +77,8 @@ const App = () => {
     <Table>
       <thead>
         <tr>
-          <th>本の名前</th>
+          <th>検索した本の名前</th>
+          <th>検索結果</th>
           <th>
             <select onChange={(e) => findByLibrary(e.target.value)}>
               {libNames.map((lib, i) => (

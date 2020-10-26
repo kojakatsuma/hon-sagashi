@@ -17,8 +17,8 @@ export const search = async (wsEndpoint: string, titleChunk: string[]) => {
   const page = await browser.newPage()
   const results = []
   const searchTitle = async (title: string) => {
-    const [url, libs, isSuggest, isWakatiGaki] = await searchInOotaku(page, title)
-    return { title, url, libs, isSuggest, isWakatiGaki }
+    const [url, libs, isSuggest, isWakatiGaki, resultTitle] = await searchInOotaku(page, title)
+    return { title, url, libs, isSuggest, isWakatiGaki, resultTitle }
   }
   for (const title of titleChunk) {
     try {
@@ -32,7 +32,7 @@ export const search = async (wsEndpoint: string, titleChunk: string[]) => {
   return results
 }
 
-export const searchInOotaku = async (page: Page, title: string, isWakatiGaki: boolean = false): Promise<[string, string[], boolean, boolean]> => {
+export const searchInOotaku = async (page: Page, title: string, isWakatiGaki: boolean = false): Promise<[string, string[], boolean, boolean, string]> => {
   await page.goto('https://www.lib.city.ota.tokyo.jp/index.html');
   await page.waitForSelector('.imeon');
   const search = await page.$('.imeon');
@@ -45,14 +45,14 @@ export const searchInOotaku = async (page: Page, title: string, isWakatiGaki: bo
   console.log(`searching for ${title}`);
   await page.waitForSelector('#honbun > section');
 
-  const topLink = await page.evaluate(() => {
+  const [topLink, topTitle] = await page.evaluate(() => {
     const topResult = document.querySelector('#result > section > h3 > a') as HTMLLinkElement;
-    return topResult?.href;
+    return [topResult?.href, topResult?.textContent || "なし"];
   });
 
   if (topLink) {
     const libs = await getLibs(page, topLink)
-    return [topLink, libs, false, isWakatiGaki];
+    return [topLink, libs, false, isWakatiGaki, topTitle];
   }
 
   const suggest = await page.$(
@@ -62,17 +62,14 @@ export const searchInOotaku = async (page: Page, title: string, isWakatiGaki: bo
   if (suggest) {
     await suggest.click();
     await page.waitForSelector('#honbun > section');
-    const linkOfSuggest = await page.evaluate(() => {
+    const [linkOfSuggest, suggestTitle] = await page.evaluate(() => {
       const topResult = document.querySelector('#result > section > h3 > a') as HTMLLinkElement;
-      if (topResult) {
-        return topResult.href;
-      }
-      return null;
+      return [topResult?.href, topResult?.textContent || ""];
     });
 
     if (linkOfSuggest) {
       const libs = await getLibs(page, linkOfSuggest)
-      return [linkOfSuggest, libs, true, isWakatiGaki];
+      return [linkOfSuggest, libs, true, isWakatiGaki, suggestTitle];
     }
   }
   if (!isWakatiGaki) {
@@ -80,6 +77,6 @@ export const searchInOotaku = async (page: Page, title: string, isWakatiGaki: bo
     return await searchInOotaku(page, wakatiTitle, true)
   }
 
-  return ["なし", ["なし"], true, isWakatiGaki]
+  return ["なし", ["なし"], true, isWakatiGaki, "なし"]
 };
 
