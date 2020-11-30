@@ -1,1 +1,0 @@
-{"version":3,"sources":["index.css"],"names":[],"mappings":"AAAA,MACI,wBACF,CAEA,kBACE,YACF,CAEA,wBACE,qBACF","file":"main.0f1c2af0.chunk.css","sourcesContent":["table{\n    border-collapse: collapse;\n  }\n  \n  table th,table td{\n    padding: 10px;\n  }\n  \n  table tr:nth-child(odd){\n    background-color: #eee\n  }"]}
