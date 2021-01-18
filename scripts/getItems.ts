@@ -9,16 +9,19 @@ export const getItems = async (wsEndpoint: string) => {
     });
   })
   await page.goto(
-    'https://www.amazon.co.jp/hz/wishlist/printview/1LT97CIJHMD3V'
+    'https://www.amazon.co.jp/hz/wishlist/ls/1LT97CIJHMD3V'
   );
 
-  await page.waitForSelector(".a-align-center > .a-text-bold")
 
+  while (!await page.$('#endOfListMarker')) {
+    await page.mouse.wheel({ deltaY: Number.MAX_SAFE_INTEGER })
+  }
+  await page.waitForSelector('#endOfListMarker')
   const titlelist = await page.evaluate(() => {
-    const title: string[] = [];
-    document.querySelectorAll(".a-align-center > .a-text-bold")
-      .forEach(({ textContent }) => textContent && title.push(textContent));
-    return title;
+    const titles: { title: string, amazonUrl: string }[] = []
+    document.querySelectorAll<HTMLLinkElement>('div.a-column.a-span12.g-span12when-narrow.g-span7when-wide > div:nth-child(1) > h3 > a')
+      .forEach(({ textContent, href }) => textContent && href && titles.push({ title: textContent, amazonUrl: href }));
+    return titles
   });
   console.log(`complete getItem: ${titlelist.length}`)
   browser.disconnect()

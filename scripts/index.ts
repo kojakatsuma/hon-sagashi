@@ -4,10 +4,10 @@ import { getItems } from './getItems';
 import { search } from "./searchInOotaku";
 import path from "path";
 
-const chunk = (arr: string[], size: number) => {
+function chunk<T>(arr: T[], size: number){
   return arr.reduce(
     (newarr, _, i) => (i % size ? newarr : [...newarr, arr.slice(i, i + size)]),
-    [] as string[][]
+    [] as T[][]
   )
 }
 
@@ -27,7 +27,7 @@ const chunk = (arr: string[], size: number) => {
   }
   const chunkSize = Math.round(titlelist.length > 10 ? titlelist.length * 0.1 : 1)
   console.log('chunk size is ', chunkSize)
-  const books = await (await Promise.all(chunk(titlelist, chunkSize).map(titleChunk => search(browserWSEndpoint, titleChunk)))).flat()
+  const books = await (await Promise.all(chunk(titlelist, chunkSize).map(chunk => search(browserWSEndpoint, chunk)))).flat()
   fs.writeFileSync(
     path.resolve(__dirname, '../front/src/result.json'),
     JSON.stringify(books),
