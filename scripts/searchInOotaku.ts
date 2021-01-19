@@ -11,7 +11,7 @@ const getLibs = async (page: Page, detaliOfBookLink: string) => {
     return libList.filter(lib => lib)
   })
   const ndc = await page.evaluate(() => {
-    return document.querySelector('div > table > tbody > tr:nth-child(1) > td:nth-child(5)')?.textContent || ''
+    return document.evaluate("//th[contains(., 'ＮＤＣ１０')]/following-sibling::td/span/span", document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null).snapshotItem(0)?.textContent || ''
   }).then(ndc => NDC.find(({ id }) => id === ndc.substr(0, 2))?.name || '')
   return { libs, ndc }
 }
