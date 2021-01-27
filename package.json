@@ -6,7 +6,6 @@
   "scripts": {
     "prestart": "tsc",
     "start": "node lib/index.js",
-    "poststart": "cd front && npm run build",
     "deploy": "gh-pages -d front/build",
     "push": "git add -u && git commit -m 'update' && git push origin"
   },
