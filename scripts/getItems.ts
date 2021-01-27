@@ -8,8 +8,9 @@ export const getItems = async (wsEndpoint: string) => {
       get: () => undefined,
     });
   })
+
   await page.goto(
-    'https://www.amazon.co.jp/hz/wishlist/ls/1LT97CIJHMD3V'
+    'https://www.amazon.co.jp/hz/wishlist/ls/1LT97CIJHMD3V?viewType=grid'
   );
 
 
@@ -19,8 +20,8 @@ export const getItems = async (wsEndpoint: string) => {
   await page.waitForSelector('#endOfListMarker')
   const titlelist = await page.evaluate(() => {
     const titles: { title: string, amazonUrl: string }[] = []
-    document.querySelectorAll<HTMLLinkElement>('div.a-column.a-span12.g-span12when-narrow.g-span7when-wide > div:nth-child(1) > h3 > a')
-      .forEach(({ textContent, href }) => textContent && href && titles.push({ title: textContent, amazonUrl: href }));
+    document.querySelectorAll<HTMLLinkElement>('div.a-section.a-spacing-none.wl-grid-item-content.wl-grid-item-flex-container > div > a')
+      .forEach(({ title, href }) => title && href && titles.push({ title, amazonUrl: href }));
     return titles
   });
   console.log(`complete getItem: ${titlelist.length}`)
