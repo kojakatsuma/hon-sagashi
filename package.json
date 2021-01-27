@@ -5,7 +5,7 @@
   "main": "src/index.ts",
   "scripts": {
     "prestart": "tsc",
-    "start": "node lib/index.js",
+    "start": "node --max-old-space-size=512 lib/index.js",
     "deploy": "gh-pages -d front/build",
     "push": "git add -u && git commit -m 'update' && git push origin"
   },
