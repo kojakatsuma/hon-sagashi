@@ -19,6 +19,7 @@ const getLibs = async (page: Page, detaliOfBookLink: string) => {
 export const search = async (wsEndpoint: string, chunk: { title: string; amazonUrl: string }[]) => {
   const browser = await puppeteer.connect({ browserWSEndpoint: wsEndpoint })
   const page = await browser.newPage()
+  await page.setDefaultNavigationTimeout(0); 
   const results = []
   const searchTitle = async (title: string) => {
     const [url, libs, isSuggest, isWakatiGaki, resultTitle, ndc] = await searchInOotaku(page, title)
@@ -28,7 +29,7 @@ export const search = async (wsEndpoint: string, chunk: { title: string; amazonU
     try {
       results.push({ ...await searchTitle(title), amazonUrl })
     } catch (error) {
-      console.log('error....retry')
+      console.error(error)
       results.push({ ...await searchTitle(title), amazonUrl })
     }
   }
