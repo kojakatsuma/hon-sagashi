@@ -5,7 +5,7 @@
   "main": "src/index.ts",
   "scripts": {
     "prestart": "tsc",
-    "start": "node lib/index.js",
+    "start": "node lib/index.js && osascript -e 'display notification \"copy_database.sh\" with title \"🎉🎉🎉書籍データの更新が終わりました。🎉🎉🎉\" sound name \"Glass\"'",
     "deploy": "gh-pages -d front/build",
     "push": "git add -u && git commit -m 'update' && git push origin"
   },
