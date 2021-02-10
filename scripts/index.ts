@@ -49,7 +49,7 @@ function chunk<T>(arr: T[], size: number) {
     },
   )
   fs.writeFileSync(
-    path.resolve(__dirname, './result.json'),
+    path.resolve(__dirname, '../scripts/result.json'),
     JSON.stringify(all),
     {
       encoding: 'utf-8',
