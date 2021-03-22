@@ -1,10 +1,10 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "2aa32549454d163d16a7c15d0f7db0bb",
+    "revision": "d12cd482e5933bba8d6bcb76e5a4149e",
     "url": "/hon-sagashi/index.html"
   },
   {
-    "revision": "f13ef159f1d1f93bcf03",
+    "revision": "9f5e28a849c03fd8bae6",
     "url": "/hon-sagashi/static/css/main.fc1ece6e.chunk.css"
   },
   {
@@ -16,8 +16,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/hon-sagashi/static/js/2.9a852fcb.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "f13ef159f1d1f93bcf03",
-    "url": "/hon-sagashi/static/js/main.7935a4f1.chunk.js"
+    "revision": "9f5e28a849c03fd8bae6",
+    "url": "/hon-sagashi/static/js/main.1995540c.chunk.js"
   },
   {
     "revision": "f35b7fd70216c0004177",
