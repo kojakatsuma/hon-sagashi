@@ -26,31 +26,20 @@ function chunk<T>(arr: T[], size: number) {
     await browser.close()
     process.exit()
   }
-  const notFoundBooks = titlelist.filter(e => !results.find(r => r.title === e.title) || results.find(r => r.title === e.title && r.libs[0] === 'なし'))
-    .concat(results.filter(r => (r.isWakatiGaki || r.isSuggest) && r.title.replace(/\s+/g, "") !== r.resultTitle.replace(/\s+/g, "")))
-  const chunkSize = Math.round(notFoundBooks.length > 10 ? notFoundBooks.length * 0.1 : 1)
-  console.log('search target count is  ', notFoundBooks.length)
+  const chunkSize = Math.round(titlelist.length > 10 ? titlelist.length * 0.1 : 1)
+  console.log('search target count is  ', titlelist.length)
   console.log('chunk size is ', chunkSize)
-  const books = await (await Promise.all(chunk(notFoundBooks, chunkSize).map(chunk => search(browserWSEndpoint, chunk)))).flat()
-  const merged = results.map(result => {
-    const book = books.find(b => b.title === result.title)
-    if (book) {
-      return book
-    }
-    return result
-  })
-  const newSearchBooks = books.filter(book => !results.find(r => r.title === book.title))
-  const all = newSearchBooks.concat(merged)
+  const books = await (await Promise.all(chunk(titlelist, chunkSize).map(chunk => search(browserWSEndpoint, chunk)))).flat()
   fs.writeFileSync(
     path.resolve(__dirname, '../front/src/result.json'),
-    JSON.stringify(all),
+    JSON.stringify(books),
     {
       encoding: 'utf-8',
     },
   )
   fs.writeFileSync(
     path.resolve(__dirname, '../scripts/result.json'),
-    JSON.stringify(all),
+    JSON.stringify(books),
     {
       encoding: 'utf-8',
     },
