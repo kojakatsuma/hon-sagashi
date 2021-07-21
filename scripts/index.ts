@@ -19,11 +19,11 @@ const booksForSearch = (titleList: { amazonUrl: string, title: string }[]) => {
   const findedBooks: {
     title: string;
     url: string;
-    libs: string[];
+    libs?: string[];
     isSuggest: boolean;
     isWakatiGaki: boolean;
     resultTitle: string;
-    ndc: string;
+    ndc?: string;
     amazonUrl: string;
   }[] = []
   titleList.forEach((t) => {
