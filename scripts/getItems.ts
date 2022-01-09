@@ -20,7 +20,7 @@ export const getItems = async (wsEndpoint: string) => {
   await page.waitForSelector('#itemName_I2232M5YMFCV69')
   const titlelist = await page.evaluate(() => {
     const titles: { title: string, amazonUrl: string }[] = []
-    document.querySelectorAll<HTMLLinkElement>('div > div.a-column.a-span12.g-span12when-narrow.g-span7when-wide > div:nth-child(1) > h3 > a')
+    document.querySelectorAll<HTMLLinkElement>('div > div.a-column.a-span12.g-span12when-narrow.g-span7when-wide > div:nth-child(1) > h2 > a')
       .forEach(({ title, href }) => title && href && titles.push({ title, amazonUrl: href }));
     return titles
   });
